@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commander Imports | High Performance Service</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        commander: {
+                            black: '#050505',
+                            dark: '#0F0F0F',
+                            red: '#C20000', // Vermelho mais profundo e luxuoso
+                            gray: '#2A2A2A',
+                            silver: '#E5E5E5'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Cinzel', 'serif'],
+                        sans: ['Montserrat', 'sans-serif'],
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #C20000;
+        }
+
+        /* Animations */
+        .fade-in-up {
+            animation: fadeInUp 1s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-400 { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .luxury-border {
+            position: relative;
+        }
+        .luxury-border::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background-color: #C20000;
+            transition: width 0.3s ease;
+        }
+        .luxury-border:hover::after {
+            width: 100%;
+        }
+
+        /* Shifter Styles */
+        .gear-active {
+            color: #C20000 !important;
+            text-shadow: 0 0 8px rgba(194, 0, 0, 0.6);
+            font-weight: bold;
+        }
+        .knob-shadow {
+            box-shadow: 
+                inset -2px -2px 6px rgba(0,0,0,0.5),
+                inset 2px 2px 6px rgba(255,255,255,0.3),
+                0 4px 8px rgba(0,0,0,0.8);
+        }
+        /* Efeito de metal escovado para a grelha */
+        .metal-plate {
+            background: linear-gradient(135deg, #2b2b2b 0%, #1a1a1a 100%);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 0 2px rgba(255,255,255,0.1);
+        }
+        
+        /* Cursor para o Knob */
+        #gear-knob {
+            cursor: grab;
+        }
+        #gear-knob:active {
+            cursor: grabbing;
+        }
+        .gear-label {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .gear-label:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="bg-commander-black text-commander-silver font-sans antialiased overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-gradient-to-b from-black/70 to-transparent transition-all duration-500" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-24">
+                <!-- Logo -->
+                <div class="flex-shrink-0 cursor-pointer">
+                    <img class="h-10 w-auto object-contain hover:brightness-110 transition-all" src="/assets/images/logo.png" alt="Commander Imports Logo">
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-12">
+                        <a href="#home" class="text-sm uppercase tracking-[0.2em] hover:text-commander-red transition-colors duration-300 font-medium">Home</a>
+                        <a href="#about" class="text-sm uppercase tracking-[0.2em] hover:text-commander-red transition-colors duration-300 font-medium">Sobre</a>
+                        <a href="#services" class="text-sm uppercase tracking-[0.2em] hover:text-commander-red transition-colors duration-300 font-medium">Expertise</a>
+                        <a href="#contact" class="border border-white/20 hover:border-commander-red hover:bg-commander-red text-white px-6 py-3 text-xs uppercase tracking-widest transition-all duration-300 font-bold">
+                            Concierge
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-white hover:text-commander-red transition-colors p-2">
+                        <i data-lucide="menu" class="w-8 h-8"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-commander-black/95 backdrop-blur-xl border-b border-white/10 transition-all duration-300">
+            <div class="px-4 pt-2 pb-6 space-y-4 flex flex-col items-center">
+                <a href="#home" class="text-white hover:text-commander-red text-sm uppercase tracking-[0.2em] py-4 w-full text-center border-b border-white/5" onclick="toggleMobileMenu()">Home</a>
+                <a href="#about" class="text-white hover:text-commander-red text-sm uppercase tracking-[0.2em] py-4 w-full text-center border-b border-white/5" onclick="toggleMobileMenu()">Sobre</a>
+                <a href="#services" class="text-white hover:text-commander-red text-sm uppercase tracking-[0.2em] py-4 w-full text-center border-b border-white/5" onclick="toggleMobileMenu()">Expertise</a>
+                <a href="#contact" class="text-commander-red font-bold text-sm uppercase tracking-[0.2em] py-4 w-full text-center" onclick="toggleMobileMenu()">Concierge</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative h-screen flex items-center justify-center overflow-hidden section-gear" data-gear="1">
+        <!-- Background with Dark Overlay -->
+        <div class="absolute inset-0 z-0">
+            <!-- Imagem de fundo luxuosa (Porsche) -->
+            <img src="https://images.unsplash.com/photo-1580274455191-1c62238fa333?q=80&w=2070&auto=format&fit=crop" alt="Porsche Luxury Background" class="w-full h-full object-cover opacity-60">
+            <div class="absolute inset-0 bg-gradient-to-t from-commander-black via-commander-black/50 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-commander-black via-transparent to-commander-black"></div>
+        </div>
+
+        <div class="relative z-10 text-center max-w-5xl px-4 pt-20"> 
+            <p class="text-commander-red uppercase tracking-[0.4em] text-sm md:text-base font-bold mb-6 fade-in-up">Premium Automotive Service</p>
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-serif text-white mb-8 leading-tight fade-in-up delay-200">
+                Excelência em <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">Importados</span>
+            </h1>
+            <p class="text-gray-400 text-lg md:text-xl font-light mb-12 max-w-2xl mx-auto leading-relaxed fade-in-up delay-400">
+                Especialistas em Porsche, Audi, Mercedes-Benz, BMW e Volkswagen. Atendimento de alta performance para Multi Marcas.
+            </p>
+            <div class="fade-in-up delay-400">
+                <!-- WhatsApp Atualizado com mensagem -->
+                <a href="https://wa.me/5511996643445?text=Ol%C3%A1%20vim%20do%20site%20e%20quero%20fazer%20um%20agendamento!" target="_blank" class="group relative inline-flex items-center justify-center px-8 py-4 overflow-hidden font-medium tracking-tighter text-white bg-transparent border border-white/30 hover:border-commander-red transition-all duration-300">
+                    <span class="absolute w-0 h-0 transition-all duration-500 ease-out bg-commander-red rounded-full group-hover:w-96 group-hover:h-96 opacity-10"></span>
+                    <span class="relative uppercase tracking-widest text-sm font-bold flex items-center gap-3">
+                        Agendar Diagnóstico <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce opacity-50">
+            <i data-lucide="arrow-down" class="w-6 h-6 text-white"></i>
+        </div>
+    </section>
+
+    <!-- About / Philosophy Section -->
+    <section id="about" class="py-24 bg-commander-dark relative section-gear" data-gear="2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="relative">
+                    <div class="absolute -top-4 -left-4 w-24 h-24 border-t-2 border-l-2 border-commander-red/30"></div>
+                    <img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=2070&auto=format&fit=crop" alt="Mercedes Engine Detail" class="w-full h-auto grayscale hover:grayscale-0 transition-all duration-700 shadow-2xl">
+                    <div class="absolute -bottom-4 -right-4 w-24 h-24 border-b-2 border-r-2 border-commander-red/30"></div>
+                </div>
+                
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-serif text-white mb-8 luxury-border inline-block">Engenharia de Precisão</h2>
+                    <p class="text-gray-400 mb-6 leading-loose text-justify">
+                        Na Commander Imports, entendemos que seu veículo não é apenas um meio de transporte, mas uma obra de engenharia. Nossa filosofia é baseada na preservação da originalidade e performance de fábrica.
+                    </p>
+                    <p class="text-gray-400 mb-8 leading-loose text-justify">
+                        Utilizamos equipamentos de diagnóstico oficiais e peças genuínas para garantir que marcas como Porsche, Audi e Volkswagen recebam o tratamento que foram projetadas para ter.
+                    </p>
+                    
+                    <div class="grid grid-cols-2 gap-8 mt-10">
+                        <div>
+                            <!-- Atualizado para 10 anos -->
+                            <span class="text-4xl font-serif text-commander-red block mb-2">10</span>
+                            <span class="text-xs uppercase tracking-widest text-gray-500">Anos de Experiência</span>
+                        </div>
+                        <div>
+                            <span class="text-4xl font-serif text-commander-red block mb-2">100%</span>
+                            <span class="text-xs uppercase tracking-widest text-gray-500">Peças Originais</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Grid -->
+    <section id="services" class="py-24 bg-commander-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <span class="text-commander-red text-xs font-bold uppercase tracking-[0.3em]">Nossa Expertise</span>
+                <h2 class="text-3xl md:text-5xl font-serif text-white mt-4">Soluções High-End</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
+                <!-- Service 1 -->
+                <div class="group p-10 bg-commander-dark border border-white/5 hover:border-commander-red/50 transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-12 h-12 mb-6 text-commander-red">
+                        <i data-lucide="wrench" class="w-full h-full stroke-[1.5]"></i>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-4">Manutenção Preventiva</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        Revisões seguindo rigorosamente o manual do fabricante, utilizando fluidos e filtros de alta performance para longevidade do motor.
+                    </p>
+                </div>
+
+                <!-- Service 2 (New) -->
+                <div class="group p-10 bg-commander-dark border border-white/5 hover:border-commander-red/50 transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-12 h-12 mb-6 text-commander-red">
+                        <i data-lucide="hammer" class="w-full h-full stroke-[1.5]"></i>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-4">Manutenção Corretiva</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        Solução definitiva para falhas mecânicas e eletrônicas. Substituição de componentes danificados garantindo a performance original.
+                    </p>
+                </div>
+
+                <!-- Service 3 (New) -->
+                <div class="group p-10 bg-commander-dark border border-white/5 hover:border-commander-red/50 transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-12 h-12 mb-6 text-commander-red">
+                        <i data-lucide="activity" class="w-full h-full stroke-[1.5]"></i>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-4">Manutenção Preditiva</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        Monitoramento de desgaste e análise técnica para antecipar reparos antes que ocorram falhas, otimizando a segurança.
+                    </p>
+                </div>
+
+                <!-- Service 4 -->
+                <div class="group p-10 bg-commander-dark border border-white/5 hover:border-commander-red/50 transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-12 h-12 mb-6 text-commander-red">
+                        <i data-lucide="cpu" class="w-full h-full stroke-[1.5]"></i>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-4">Diagnóstico Avançado</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        Scanners de última geração específicos para montadoras alemãs, inglesas e italianas. Identificação precisa de falhas eletrônicas.
+                    </p>
+                </div>
+
+                <!-- Service 5 -->
+                <div class="group p-10 bg-commander-dark border border-white/5 hover:border-commander-red/50 transition-all duration-500 hover:-translate-y-2">
+                    <div class="w-12 h-12 mb-6 text-commander-red">
+                        <!-- Ícone de código/terminal para representar reprogramação -->
+                        <i data-lucide="terminal" class="w-full h-full stroke-[1.5]"></i>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-4">Reprogramação de Módulos</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        Atualização de software de ECUs, codificação de componentes e parametrização de sistemas eletrônicos conforme padrão original.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews Section -->
+    <section id="reviews" class="py-24 bg-commander-black border-t border-white/5 relative section-gear" data-gear="4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-commander-red text-xs font-bold uppercase tracking-[0.3em]">Testimonials</span>
+                <h2 class="text-3xl md:text-4xl font-serif text-white mt-4">Experiências Exclusivas</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <!-- Review 1 -->
+                <div class="bg-commander-dark p-8 border border-white/5 relative group hover:-translate-y-2 transition-all duration-500">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=200&auto=format&fit=crop" alt="Roberto Alencar" class="w-16 h-16 object-cover rounded-full border-2 border-commander-red/50 grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div>
+                            <h4 class="text-white font-serif text-lg">Roberto Alencar</h4>
+                            <p class="text-commander-red text-xs uppercase tracking-widest">Porsche 911 Carrera S</p>
+                        </div>
+                    </div>
+                    <div class="flex text-yellow-500 mb-4 gap-1">
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed italic">"Atendimento impecável. A revisão do meu 911 foi feita com rigor técnico que só encontrei na Europa. Transparência total no diagnóstico."</p>
+                </div>
+
+                <!-- Review 2 -->
+                <div class="bg-commander-dark p-8 border border-white/5 relative group hover:-translate-y-2 transition-all duration-500">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop" alt="Juliana Paiva" class="w-16 h-16 object-cover rounded-full border-2 border-commander-red/50 grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div>
+                            <h4 class="text-white font-serif text-lg">Juliana Paiva</h4>
+                            <p class="text-commander-red text-xs uppercase tracking-widest">Range Rover Sport</p>
+                        </div>
+                    </div>
+                    <div class="flex text-yellow-500 mb-4 gap-1">
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed italic">"Levei minha Range Rover para um problema crônico de suspensão que ninguém resolvia. A equipe diagnosticou e resolveu em 2 dias."</p>
+                </div>
+
+                <!-- Review 3 -->
+                <div class="bg-commander-dark p-8 border border-white/5 relative group hover:-translate-y-2 transition-all duration-500">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop" alt="Carlos Eduardo" class="w-16 h-16 object-cover rounded-full border-2 border-commander-red/50 grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div>
+                            <h4 class="text-white font-serif text-lg">Carlos Eduardo</h4>
+                            <p class="text-commander-red text-xs uppercase tracking-widest">BMW M3 Competition</p>
+                        </div>
+                    </div>
+                    <div class="flex text-yellow-500 mb-4 gap-1">
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed italic">"Confiança é tudo quando se trata de um M3. O conhecimento técnico sobre a linha M é surpreendente. Recomendo de olhos fechados."</p>
+                </div>
+
+                <!-- Review 4 -->
+                <div class="bg-commander-dark p-8 border border-white/5 relative group hover:-translate-y-2 transition-all duration-500">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=200&auto=format&fit=crop" alt="Fernanda Siqueira" class="w-16 h-16 object-cover rounded-full border-2 border-commander-red/50 grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div>
+                            <h4 class="text-white font-serif text-lg">Fernanda Siqueira</h4>
+                            <p class="text-commander-red text-xs uppercase tracking-widest">Audi RS6 Avant</p>
+                        </div>
+                    </div>
+                    <div class="flex text-yellow-500 mb-4 gap-1">
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed italic">"Profissionalismo raro. A revisão da minha RS6 foi detalhada e o consultor me manteve informada de cada etapa. O carro voltou perfeito."</p>
+                </div>
+
+                <!-- Review 5 -->
+                <div class="bg-commander-dark p-8 border border-white/5 relative group hover:-translate-y-2 transition-all duration-500">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop" alt="Marcelo Torres" class="w-16 h-16 object-cover rounded-full border-2 border-commander-red/50 grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div>
+                            <h4 class="text-white font-serif text-lg">Marcelo Torres</h4>
+                            <p class="text-commander-red text-xs uppercase tracking-widest">Volvo XC90 Hybrid</p>
+                        </div>
+                    </div>
+                    <div class="flex text-yellow-500 mb-4 gap-1">
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed italic">"Difícil achar quem entenda de híbridos com profundidade. A Commander superou minhas expectativas no diagnóstico do sistema elétrico."</p>
+                </div>
+
+                <!-- Review 6 -->
+                <div class="bg-commander-dark p-8 border border-white/5 relative group hover:-translate-y-2 transition-all duration-500">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop" alt="Camila Diniz" class="w-16 h-16 object-cover rounded-full border-2 border-commander-red/50 grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div>
+                            <h4 class="text-white font-serif text-lg">Camila Diniz</h4>
+                            <p class="text-commander-red text-xs uppercase tracking-widest">Mercedes-Benz G63 AMG</p>
+                        </div>
+                    </div>
+                    <div class="flex text-yellow-500 mb-4 gap-1">
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed italic">"Lugar de confiança para carros especiais. Cuidaram da minha G63 com o zelo que ela merece. A transparência nos custos foi um diferencial."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Brands Marquee (Static elegant grid instead of moving carousel for luxury feel) -->
+    <section class="py-20 bg-commander-dark border-y border-white/5 section-gear" data-gear="5">
+        <div class="max-w-7xl mx-auto px-4">
+            <h3 class="text-center text-gray-600 text-xs uppercase tracking-[0.3em] mb-12">Principais Especialidades</h3>
+            <div class="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+                <!-- Using Text for Brands to keep it minimal and avoid broken image links, styled elegantly -->
+                <span class="text-2xl font-serif text-white hover:text-commander-red transition-colors cursor-default">PORSCHE</span>
+                <span class="text-2xl font-serif text-white hover:text-commander-red transition-colors cursor-default">AUDI</span>
+                <span class="text-2xl font-serif text-white hover:text-commander-red transition-colors cursor-default">MERCEDES-BENZ</span>
+                <span class="text-2xl font-serif text-white hover:text-commander-red transition-colors cursor-default">BMW</span>
+                <span class="text-2xl font-serif text-white hover:text-commander-red transition-colors cursor-default">VOLKSWAGEN</span>
+                <span class="text-2xl font-serif text-white hover:text-commander-red transition-colors cursor-default border-l border-white/20 pl-12">MULTI MARCAS</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="relative py-32 bg-fixed bg-center bg-cover section-gear" data-gear="6" style="background-image: url('https://images.unsplash.com/photo-1542282088-fe8426682b8f?q=80&w=1887&auto=format&fit=crop');">
+        <div class="absolute inset-0 bg-black/80"></div>
+        <div class="relative z-10 max-w-4xl mx-auto text-center px-4">
+            <h2 class="text-4xl md:text-5xl font-serif text-white mb-6">Seu importado em boas mãos</h2>
+            <p class="text-gray-300 text-lg mb-10 font-light">Agende uma visita e conheça nosso padrão de qualidade.</p>
+            <!-- WhatsApp Atualizado com mensagem -->
+            <a href="https://wa.me/5511996643445?text=Ol%C3%A1%20vim%20do%20site%20e%20quero%20fazer%20um%20agendamento!" target="_blank" class="inline-block bg-commander-red hover:bg-red-800 text-white px-10 py-4 uppercase tracking-[0.2em] font-bold text-sm transition-all duration-300 shadow-lg hover:shadow-red-900/50">
+                Agendamento
+            </a>
+        </div>
+    </section>
+
+    <!-- Contact & Footer -->
+    <footer id="contact" class="bg-commander-black pt-20 border-t border-white/10 section-gear" data-gear="6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <!-- Info -->
+                <div>
+                    <img class="h-12 w-auto mb-8 opacity-80" src="/assets/images/logo.png" alt="Commander Logo">
+                    <p class="text-gray-500 text-sm leading-relaxed mb-6">
+                        Excelência técnica e atendimento personalizado para veículos premium. Localizada estrategicamente para melhor atendê-lo.
+                    </p>
+                    <div class="flex space-x-4">
+                        <!-- Instagram Atualizado -->
+                        <a href="https://www.instagram.com/commanderimports/" target="_blank" class="text-gray-400 hover:text-commander-red transition-colors"><i data-lucide="instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-commander-red transition-colors"><i data-lucide="facebook"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-commander-red transition-colors"><i data-lucide="linkedin"></i></a>
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h4 class="text-white font-serif text-lg mb-8">Contato</h4>
+                    <ul class="space-y-4 text-sm text-gray-400">
+                        <li class="flex items-start gap-3">
+                            <i data-lucide="map-pin" class="text-commander-red w-5 h-5 mt-0.5"></i>
+                            <span>Av. Exclusiva, 1234 - Jardins<br>São Paulo - SP</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i data-lucide="phone" class="text-commander-red w-5 h-5"></i>
+                            <!-- Telefone Atualizado -->
+                            <span>(11) 99664-3445</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i data-lucide="mail" class="text-commander-red w-5 h-5"></i>
+                            <span>contato@commanderimports.com.br</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Hours -->
+                <div>
+                    <h4 class="text-white font-serif text-lg mb-8">Horário de Atendimento</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li class="flex justify-between border-b border-white/5 pb-2">
+                            <span>Segunda - Sexta</span>
+                            <span>08:00 - 18:00</span>
+                        </li>
+                        <li class="flex justify-between border-b border-white/5 pb-2 pt-2">
+                            <span>Sábado</span>
+                            <span>Apenas com Agendamento</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-white/5 py-8 text-center">
+            <p class="text-gray-600 text-xs tracking-widest uppercase">
+                &copy; 2025 Commander Imports. Todos os direitos reservados.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Floating Manual Gear Shifter (H-Pattern) -->
+    <!-- Ajustado a escala: scale-50 (mobile) e md:scale-75 (desktop) para ficar ainda menor -->
+    <div class="fixed bottom-4 left-4 md:bottom-8 md:left-8 z-40 flex scale-50 md:scale-75 origin-bottom-left flex-col items-center gap-2 bg-gradient-to-br from-[#111] to-black p-4 rounded-full border-4 border-[#222] shadow-[0_10px_40px_rgba(0,0,0,0.9)] transition-all duration-300 group">
+        
+        <!-- Gear Numbers (Visual Guide above) -->
+        <div class="flex justify-between w-24 px-1 mb-1 text-[10px] font-bold text-gray-600 font-sans tracking-widest">
+            <span class="gear-label hover:text-commander-red" onclick="shiftToGear(1)" data-gear="1">1</span>
+            <span class="gear-label hover:text-commander-red" onclick="shiftToGear(3)" data-gear="3">3</span>
+            <span class="gear-label hover:text-commander-red" onclick="shiftToGear(5)" data-gear="5">5</span>
+        </div>
+
+        <!-- Shifter Gate Area -->
+        <div class="relative w-28 h-24 metal-plate rounded-lg overflow-hidden border border-white/5">
+            <!-- The H-Gate SVG -->
+            <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 112 96">
+                <!-- Gate cutout styling -->
+                <path d="M16 16 V80 M56 16 V80 M96 16 V80 M16 48 H96" stroke="#050505" stroke-width="8" stroke-linecap="round" />
+                <path d="M16 16 V80 M56 16 V80 M96 16 V80 M16 48 H96" stroke="#333" stroke-width="2" stroke-linecap="round" fill="none" class="opacity-50"/>
+            </svg>
+
+            <!-- Shifter Stick & Knob -->
+            <div id="gear-stick" class="absolute w-2 h-12 bg-gray-400 origin-bottom shadow-lg transition-all duration-300 ease-in-out" 
+                 style="top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.5;">
+            </div>
+
+            <div id="gear-knob" class="absolute w-10 h-10 bg-gradient-to-br from-commander-red to-[#800000] rounded-full knob-shadow border border-white/10 z-20 flex items-center justify-center transition-all duration-500 cubic-bezier(0.68, -0.55, 0.27, 1.55)">
+                <!-- Shiny reflection -->
+                <div class="absolute top-2 left-2 w-3 h-3 bg-white rounded-full opacity-20 filter blur-[1px]"></div>
+                <!-- Logo on knob -->
+                <div class="text-[8px] text-white/50 font-serif pointer-events-none">CM</div>
+            </div>
+        </div>
+
+        <div class="flex justify-between w-24 px-1 mt-1 text-[10px] font-bold text-gray-600 font-sans tracking-widest">
+            <span class="gear-label hover:text-commander-red" onclick="shiftToGear(2)" data-gear="2">2</span>
+            <span class="gear-label hover:text-commander-red" onclick="shiftToGear(4)" data-gear="4">4</span>
+            <span class="gear-label hover:text-commander-red" onclick="shiftToGear(6)" data-gear="6">6</span>
+        </div>
+    </div>
+
+    <!-- Floating Whatsapp -->
+    <a href="https://wa.me/5511996643445?text=Ol%C3%A1%20vim%20do%20site%20e%20quero%20fazer%20um%20agendamento!" target="_blank" class="fixed bottom-6 right-6 z-50 bg-[#25D366] hover:bg-[#128C7E] text-white p-4 rounded-full shadow-[0_0_20px_rgba(37,211,102,0.3)] hover:shadow-[0_0_30px_rgba(37,211,102,0.5)] transition-all duration-300 hover:scale-110 flex items-center gap-2 group border border-white/10">
+        <i data-lucide="message-circle" class="w-6 h-6"></i>
+        <span class="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-500 ease-in-out whitespace-nowrap font-bold text-sm">Agendar Agora</span>
+    </a>
+
+    <script>
+        lucide.createIcons();
+        
+        // Navbar transparency effect on scroll
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                // Ao rolar, aplica fundo preto e sombra
+                navbar.classList.add('bg-commander-black', 'shadow-lg');
+                navbar.classList.remove('bg-gradient-to-b', 'from-black/70', 'to-transparent');
+            } else {
+                // No topo, volta a ser transparente com gradiente
+                navbar.classList.remove('bg-commander-black', 'shadow-lg');
+                navbar.classList.add('bg-gradient-to-b', 'from-black/70', 'to-transparent');
+            }
+        });
+
+        // Mobile Menu Logic
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        function toggleMobileMenu() {
+            if (mobileMenu) {
+                mobileMenu.classList.toggle('hidden');
+            }
+        }
+
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+        }
+
+        // H-Pattern Gear Shifter Logic
+        const sections = document.querySelectorAll('.section-gear');
+        const gearKnob = document.getElementById('gear-knob');
+        const gearLabels = document.querySelectorAll('.gear-label');
+        let currentGear = 1;
+        let audioContext = null;
+        let isDragging = false; // Estado do Drag
+
+        // Sound Effect
+        function playShiftSound() {
+            if (!audioContext) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioContext = new AudioContext();
+            }
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            if (!audioContext) return;
+
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            
+            osc.type = 'square'; 
+            osc.frequency.setValueAtTime(150, audioContext.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, audioContext.currentTime + 0.1);
+            
+            gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+            
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            osc.start();
+            osc.stop(audioContext.currentTime + 0.1);
+        }
+
+        // Função auxiliar para atualizar visual
+        function updateGearVisual(gearIndex) {
+            const colCenters = [16, 56, 96]; // px
+            const rowCenters = [16, 80];     // px
+            
+            let colIndex, rowIndex;
+
+            switch(gearIndex) {
+                case 1: colIndex = 0; rowIndex = 0; break;
+                case 2: colIndex = 0; rowIndex = 1; break;
+                case 3: colIndex = 1; rowIndex = 0; break;
+                case 4: colIndex = 1; rowIndex = 1; break;
+                case 5: colIndex = 2; rowIndex = 0; break;
+                case 6: colIndex = 2; rowIndex = 1; break;
+                default: colIndex = 1; rowIndex = 0; // Neutralish
+            }
+
+            const leftPos = colCenters[colIndex] - 20; 
+            const topPos = rowCenters[rowIndex] - 20;  
+
+            gearKnob.style.left = `${leftPos}px`;
+            gearKnob.style.top = `${topPos}px`;
+            
+            gearLabels.forEach(label => {
+                label.classList.remove('gear-active');
+                if (parseInt(label.getAttribute('data-gear')) === gearIndex) {
+                    label.classList.add('gear-active');
+                }
+            });
+        }
+
+        // Função chamada ao clicar no número ou soltar o knob
+        function shiftToGear(gearIndex) {
+            currentGear = gearIndex;
+            updateGearVisual(gearIndex);
+            playShiftSound();
+            
+            // Scroll para a seção correspondente
+            const targetSection = document.querySelector(`.section-gear[data-gear="${gearIndex}"]`);
+            if (targetSection) {
+                targetSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Atualização automática via Scroll (apenas se não estiver arrastando)
+        function updateGearOnScroll() {
+            if (isDragging) return; // Pausa atualização durante drag
+
+            let activeGear = 1;
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= window.innerHeight * 0.6 && rect.bottom >= window.innerHeight * 0.4) {
+                    activeGear = parseInt(section.getAttribute('data-gear'));
+                }
+            });
+
+            if (activeGear !== currentGear) {
+                currentGear = activeGear;
+                updateGearVisual(currentGear);
+                playShiftSound();
+            }
+        }
+
+        window.addEventListener('scroll', () => {
+            requestAnimationFrame(updateGearOnScroll);
+        });
+        
+        // --- Drag Logic ---
+        let startX, startY, initialLeft, initialTop;
+
+        gearKnob.addEventListener('mousedown', startDrag);
+        gearKnob.addEventListener('touchstart', startDrag, {passive: false});
+
+        function startDrag(e) {
+            isDragging = true;
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            startX = clientX;
+            startY = clientY;
+            
+            const style = window.getComputedStyle(gearKnob);
+            initialLeft = parseInt(style.left);
+            initialTop = parseInt(style.top);
+            
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', drag, {passive: false});
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+            
+            // Remove transição para movimento instantâneo
+            gearKnob.style.transition = 'none';
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            e.preventDefault(); // Previne scroll da página no mobile
+            
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            
+            const dx = clientX - startX;
+            const dy = clientY - startY;
+            
+            // Limites simples para manter dentro da caixa (opcional, mas bom para UX)
+            // A caixa tem 112px largura, 96px altura. Knob 40px.
+            // Limites aproximados: Left -10 a 82. Top -10 a 66.
+            
+            gearKnob.style.left = `${initialLeft + dx}px`;
+            gearKnob.style.top = `${initialTop + dy}px`;
+        }
+
+        function endDrag(e) {
+            isDragging = false;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchend', endDrag);
+            
+            // Retorna transição suave para o snap
+            gearKnob.style.transition = 'all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
+            
+            // Calcular qual marcha está mais próxima
+            // Pega centro atual do knob relativo ao container pai
+            const rect = gearKnob.parentElement.getBoundingClientRect();
+            const knobRect = gearKnob.getBoundingClientRect();
+            const knobCenterX = (knobRect.left - rect.left) + (knobRect.width / 2);
+            const knobCenterY = (knobRect.top - rect.top) + (knobRect.height / 2);
+            
+            // Centros das marchas (baseado na grelha SVG)
+            const gears = [
+                { id: 1, x: 16, y: 16 },
+                { id: 2, x: 16, y: 80 },
+                { id: 3, x: 56, y: 16 },
+                { id: 4, x: 56, y: 80 },
+                { id: 5, x: 96, y: 16 },
+                { id: 6, x: 96, y: 80 }
+            ];
+            
+            let closestGear = 1;
+            let minDist = Infinity;
+            
+            gears.forEach(g => {
+                const dist = Math.sqrt(Math.pow(g.x - knobCenterX, 2) + Math.pow(g.y - knobCenterY, 2));
+                if (dist < minDist) {
+                    minDist = dist;
+                    closestGear = g.id;
+                }
+            });
+            
+            // Engata a marcha (move knob e scrolla página)
+            shiftToGear(closestGear);
+        }
+
+        // Init state
+        setTimeout(() => {
+            currentGear = 0; // Force update
+            updateGearOnScroll();
+        }, 100);
+
+        document.addEventListener('click', () => {
+            if (!audioContext) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioContext = new AudioContext();
+            }
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }, { once: true });
+
+    </script>
+</body>
+</html>
